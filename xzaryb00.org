@@ -1,0 +1,436 @@
+(setq org-confirm-babel-evaluate nil)
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [11pt,titlepage]
+#+LATEX_HEADER: \usepackage[a4paper,total={6.5in, 9in}]{geometry}
+#+LATEX_HEADER: \usepackage{libertine}
+#+LATEX_HEADER: \usepackage{minted}
+#+LATEX_HEADER: \setminted{fontsize=\footnotesize}
+#+LATEX_HEADER: \usepackage[font={small,sf},labelfont=bf,format=hang,format=plain,margin=0pt,width=0.8\textwidth,]{caption}
+#+LATEX_HEADER: \usepackage[list=true]{subcaption}
+#+OPTIONS: tags:nil creator:nil tasks:nil toc:nil
+
+#+AUTHOR: Jakub Zárybnický, xzaryb00
+#+TITLE: Projekt z MSP
+#+SUBTITLE: Logo VUT!
+#+SUBTITLE: VYSOKÉ UČENÍ TECHNICKÉ V BRNĚ
+#+SUBTITLE: Fakulta informačních technologií
+#+SUBTITLE: Čísla zadání: 21, 6
+#+SUBTITLE: Cvičení - skupina: pátek, 9.00
+#+DATE: 6. 12. 2019
+#+LANGUAGE: czech
+
+* Zadání projektu z předmětu MSP
+*Každý student obdrží na cvičení konkrétní data (čísla ze seznamu), pro které vypracuje projekt.*
+K vypracování můžete použít libovolné statistické programy.
+
+1. Při kontrole výrobků byla sledována odchylka X [mm] jejich rozměru od
+   požadované velikosti. Naměřené hodnoty tvoří statistický soubor v listu
+   Data př. 1.
+
+   1. Proveďte roztřídění statistického souboru, vytvořte tabulku četností a
+      nakreslete histogramy pro relativní četnosti a relativní kumulativní
+      četnosti.
+   2. Vypočtěte aritmetický průměr, medián, modus, rozptyl a směrodatnou
+      odchylku.
+   3. Vypočtěte bodové odhady střední hodnoty, rozptylu a směrodatné odchylky.
+   4. Testujte předpoklad o výběru z normálního rozdělení Pearsonovým
+      (chí-kvadrát) testem na hladině významnosti 0,05.
+   5. Za předpokladu (bez ohledu na výsledek části d)), že statistický soubor
+      byl získán náhodným výběrem z normálního rozdělení, určete intervalové
+      odhady střední hodnoty, rozptylu a směrodatné odchylky se spolehlivostí
+      0,95 a 0,99.
+   6. Testujte hypotézu optimálního seřízení stroje, tj. že střední hodnota
+      odchylky je nulová, proti dvoustranné alternativní hypotéze, že střední
+      hodnota odchylky je různá od nuly, a to na hladině významnosti 0,05.
+   7. Ověřte statistickým testem na hladině významnosti 0,05, zda seřízení
+      stroje ovlivnilo kvalitu výroby, víte-li, že výše uvedený statistický
+      soubor 50-ti hodnot vznikl spojením dvou dílčích statistických souborů
+      tak, že po naměření prvních 20-ti hodnot bylo provedeno nové seřízení
+      stroje a pak bylo naměřeno zbývajících 30 hodnot.
+
+   Návod: Oba soubory zpracujte neroztříděné. Testujte nejprve rovnost rozptylů
+   odchylek před a po seřízení stroje. Podle výsledku pak zvolte vhodný postup
+   pro testování rovnosti středních hodnot odchylek před a po seřízení stroje.
+
+2. Měřením dvojice (Výška[cm], Váha[kg]) u vybraných studentů z FIT byl získán
+   dvourozměrný statistický soubor zapsaný po dvojicích v řádcích v listu
+   Data př. 2.
+
+   1. Vypočtěte bodový odhad koeficientu korelace.
+   2. Na hladině významnosti 0,05 testujte hypotézu, že náhodné veličiny Výška a
+      Váha jsou lineárně nezávislé.
+   3. *Regresní analýza* - data proložte přímkou: $Vaha = \beta_0 + \beta_1 \times Vyska$
+      1. Bodově odhadněte $\beta_0$, $\beta_1$ a rozptyl $s_2$.
+      2. Na hladině významnosti 0,05 otestujte hypotézy:
+         \[H : \beta_0 = -100, H_A : \beta_0 \neq -100,\]
+         \[H : \beta_1 = 1, H_A : \beta_1 \neq 1,\]
+      3. Vytvořte graf bodů spolu s regresní přímkou a pásem spolehlivosti pro
+         individuální hodnotu výšky.
+
+*Termín pro odevzdání práce je 11 týden výuky zimního semestru ve cvičení.*
+
+#+BEGIN_SRC ipython :session :exports code :kernel ipython_python :var ex1_raw=ex1 :var ex2_raw=ex2
+  %matplotlib inline
+  import matplotlib.pyplot as plt
+  import numpy as np
+  import pandas as pd
+  from scipy.stats import norm
+  from tabulate import tabulate
+
+  def show(*args, **kwargs):
+      print(tabulate(*args, tablefmt='orgtbl', **kwargs))
+
+  ex1 = pd.DataFrame(ex1_raw, columns=['odchylka'])
+  ex2 = pd.DataFrame(ex2_raw, columns=['vyska', 'vaha'])
+#+END_SRC
+
+#+RESULTS:
+: # Out[178]:
+
+* Příklad 1
+*Při kontrole výrobků byla sledována odchylka X [mm] jejich rozměru od požadované velikosti.
+Naměřené hodnoty tvoří statistický soubor v listu Data př. 1.*
+
+#+NAME: p1-original-first-half
+#+BEGIN_SRC ipython :session :exports results :results output drawer
+  show(ex1[:25], headers=["Odchylka [mm]"], showindex=range(1, 26))
+#+END_SRC
+
+#+NAME: p1-original-second-half
+#+BEGIN_SRC ipython :session :exports results :results output drawer
+  show(ex1[25:], headers=["Odchylka [mm]"], showindex=range(26, 51))
+#+END_SRC
+
+#+NAME: p1-sorted-first-half
+#+BEGIN_SRC ipython :session :exports results :results output drawer
+  ex1s = ex1.sort_values(by='odchylka')
+  show(ex1s[:25], headers=["Odchylka [mm]"], showindex=('(' + str(i) + ')' for i in range(1, 26)))
+#+END_SRC
+
+#+NAME: p1-sorted-second-half
+#+BEGIN_SRC ipython :session :exports results :results output drawer
+  show(ex1s[25:], headers=["Odchylka [mm]"], showindex=('(' + str(i) + ')' for i in range(26, 51)))
+#+END_SRC
+
+#+LATEX: \begin{figure}\centering\subcaptionbox{Statistický soubor}{
+#+RESULTS: p1-original-first-half
+:RESULTS:
+|    | Odchylka [mm] |
+|----+---------------|
+|  1 |          1.83 |
+|  2 |          0.98 |
+|  3 |         -0.09 |
+|  4 |         -0.23 |
+|  5 |          2.56 |
+|  6 |          0.31 |
+|  7 |          1.06 |
+|  8 |          0.01 |
+|  9 |          0.75 |
+| 10 |          2.26 |
+| 11 |         -0.59 |
+| 12 |           0.9 |
+| 13 |          1.66 |
+| 14 |          0.36 |
+| 15 |          2.19 |
+| 16 |          1.24 |
+| 17 |         -0.58 |
+| 18 |          0.79 |
+| 19 |          0.02 |
+| 20 |          0.31 |
+| 21 |          1.61 |
+| 22 |          0.75 |
+| 23 |          2.46 |
+| 24 |          0.86 |
+| 25 |          0.63 |
+:END:
+#+LATEX: \quad
+#+RESULTS: p1-original-second-half
+:RESULTS:
+|    | Odchylka [mm] |
+|----+---------------|
+| 26 |         -0.98 |
+| 27 |         -0.75 |
+| 28 |          2.67 |
+| 29 |          1.79 |
+| 30 |          1.84 |
+| 31 |          0.49 |
+| 32 |          1.68 |
+| 33 |          0.39 |
+| 34 |         -0.84 |
+| 35 |          1.49 |
+| 36 |           1.5 |
+| 37 |           1.7 |
+| 38 |           3.4 |
+| 39 |           1.4 |
+| 40 |          0.27 |
+| 41 |          0.48 |
+| 42 |          0.27 |
+| 43 |          1.41 |
+| 44 |          0.55 |
+| 45 |           1.2 |
+| 46 |         -0.68 |
+| 47 |          1.59 |
+| 48 |           0.8 |
+| 49 |          1.21 |
+| 50 |         -1.31 |
+:END:
+#+LATEX: }\hfill\centering\subcaptionbox{Uspořádaný statistický soubor}{
+#+RESULTS: p1-sorted-first-half
+:RESULTS:
+|      | Odchylka [mm] |
+|------+---------------|
+| (1)  |         -1.31 |
+| (2)  |         -0.98 |
+| (3)  |         -0.84 |
+| (4)  |         -0.75 |
+| (5)  |         -0.68 |
+| (6)  |         -0.59 |
+| (7)  |         -0.58 |
+| (8)  |         -0.23 |
+| (9)  |         -0.09 |
+| (10) |          0.01 |
+| (11) |          0.02 |
+| (12) |          0.27 |
+| (13) |          0.27 |
+| (14) |          0.31 |
+| (15) |          0.31 |
+| (16) |          0.36 |
+| (17) |          0.39 |
+| (18) |          0.48 |
+| (19) |          0.49 |
+| (20) |          0.55 |
+| (21) |          0.63 |
+| (22) |          0.75 |
+| (23) |          0.75 |
+| (24) |          0.79 |
+| (25) |           0.8 |
+:END:
+#+LATEX: \quad
+#+RESULTS: p1-sorted-second-half
+:RESULTS:
+|      | Odchylka [mm] |
+|------+---------------|
+| (26) |          0.86 |
+| (27) |           0.9 |
+| (28) |          0.98 |
+| (29) |          1.06 |
+| (30) |           1.2 |
+| (31) |          1.21 |
+| (32) |          1.24 |
+| (33) |           1.4 |
+| (34) |          1.41 |
+| (35) |          1.49 |
+| (36) |           1.5 |
+| (37) |          1.59 |
+| (38) |          1.61 |
+| (39) |          1.66 |
+| (40) |          1.68 |
+| (41) |           1.7 |
+| (42) |          1.79 |
+| (43) |          1.83 |
+| (44) |          1.84 |
+| (45) |          2.19 |
+| (46) |          2.26 |
+| (47) |          2.46 |
+| (48) |          2.56 |
+| (49) |          2.67 |
+| (50) |           3.4 |
+:END:
+#+LATEX: }\hfill\centering\subcaptionbox{Uspořádaný statistický soubor}{
+
+** Proveďte roztřídění statistického souboru, vytvořte tabulku četností a nakreslete histogramy pro relativní četnosti a relativní kumulativní četnosti.
+
+#+BEGIN_SRC ipython :session :exports both :results output drawer
+  categories, bins = pd.cut(ex1.odchylka, bins=11, retbins=True)
+  print('\nBin size:' , bins[1] - bins[0], end='\n\n')
+  tbl, cumsum = [], 0
+  for ix, (bin, cnt) in enumerate(categories.value_counts(sort=False).items()):
+    cumsum += cnt
+    tbl.append([ix + 1,
+                bin,
+                str((bin.right - bin.left) / 2 + bin.left),
+                cnt,
+                cumsum,
+                cnt / len(categories),
+                cumsum / len(categories)])
+  show(tbl, headers=["Třída", "Okraje", "Střed", "Četnost", "Kum. četnost", "Rel. četnost", "Rel. kum. četnost"])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+
+Bin size: 0.4328918181818182
+
+|   Třída | Okraje            |    Střed |   Četnost |   Kum. četnost |   Rel. četnost |   Rel. kum. četnost |
+|---------+-------------------+----------+-----------+----------------+----------------+---------------------|
+|       1 | (-1.315, -0.882]  | -1.0985  |         2 |              2 |           0.04 |                0.04 |
+|       2 | (-0.882, -0.454]  | -0.668   |         5 |              7 |           0.1  |                0.14 |
+|       3 | (-0.454, -0.0255] | -0.23975 |         2 |              9 |           0.04 |                0.18 |
+|       4 | (-0.0255, 0.403]  |  0.18875 |         8 |             17 |           0.16 |                0.34 |
+|       5 | (0.403, 0.831]    |  0.617   |         8 |             25 |           0.16 |                0.5  |
+|       6 | (0.831, 1.259]    |  1.045   |         7 |             32 |           0.14 |                0.64 |
+|       7 | (1.259, 1.687]    |  1.473   |         8 |             40 |           0.16 |                0.8  |
+|       8 | (1.687, 2.115]    |  1.901   |         4 |             44 |           0.08 |                0.88 |
+|       9 | (2.115, 2.544]    |  2.3295  |         3 |             47 |           0.06 |                0.94 |
+|      10 | (2.544, 2.972]    |  2.758   |         2 |             49 |           0.04 |                0.98 |
+|      11 | (2.972, 3.4]      |  3.186   |         1 |             50 |           0.02 |                1    |
+:END:
+
+#+BEGIN_SRC ipython :session :exports both :results raw drawer
+  freq = categories.value_counts(sort=False).reset_index().odchylka
+  _ =  freq.plot.bar()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[145]:
+[[file:./obipy-resources/Ge7nfH.png]]
+:END:
+
+#+BEGIN_SRC ipython :session :exports both :results raw drawer
+  _ = freq.cumsum().plot.bar()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[146]:
+[[file:./obipy-resources/ow4Jie.png]]
+:END:
+
+** Vypočtěte aritmetický průměr, medián, modus, rozptyl a směrodatnou odchylku.
+#+BEGIN_SRC ipython :session :exports both :results output drawer
+  show({'mean': [ex1.odchylka.mean()],
+        'median': [ex1.median()],
+        'mode': [', '.join(map(str, ex1.odchylka.mode()))],
+        'var': [ex1.var()],
+        'std': [ex1.std()]}, headers="keys")
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   mean | median | mode             |     var |     std |
+|--------+--------+------------------+---------+---------|
+| 0.8724 |   0.83 | 0.27, 0.31, 0.75 | 1.07134 | 1.03506 |
+:END:
+
+** Vypočtěte bodové odhady střední hodnoty, rozptylu a směrodatné odchylky.
+
+#+BEGIN_SRC ipython :session :exports both :results output drawer
+  show({'mean': [ex1.odchylka.mean()],
+        'var': [ex1.var()],
+        'std': [ex1.std()]}, headers="keys")
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+|   mean |     var |     std |
+|--------+---------+---------|
+| 0.8724 | 1.07134 | 1.03506 |
+:END:
+
+** Testujte předpoklad o výběru z normálního rozdělení Pearsonovým (chí-kvadrát) testem na hladině významnosti 0,05
+
+#+BEGIN_SRC ipython :session :exports results :results output drawer
+  test_categories = pd.cut(ex1.odchylka, bins=7)
+  tbl, cumsum = [], 0
+  for ix, (bin, cnt) in enumerate(test_categories.value_counts(sort=False).items()):
+    cumsum += cnt
+    middle = (bin.right - bin.left) / 2 + bin.left
+    tbl.append([ix + 1, bin, str(middle), cnt, cumsum,
+                cnt / len(test_categories),
+                norm.pdf(middle) * len(categories)])
+  show(tbl, headers=["Třída", "Okraje", "Střed", "Četnost", "Kum. četnost", "Rel. četnost", "Rel. kum. četnost"])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+| Třída | Okraje           |    Střed | Četnost | Kum. četnost | Rel. četnost | Rel. kum. četnost |
+|-------+------------------+----------+---------+--------------+--------------+-------------------|
+|     1 | (-1.315, -0.637] |   -0.976 |       5 |            5 |          0.1 |           12.3888 |
+|     2 | (-0.637, 0.0357] | -0.30065 |       6 |           11 |         0.12 |           19.0657 |
+|     3 | (0.0357, 0.709]  |  0.37235 |      10 |           21 |          0.2 |           18.6112 |
+|     4 | (0.709, 1.381]   |    1.045 |      11 |           32 |         0.22 |           11.5545 |
+|     5 | (1.381, 2.054]   |   1.7175 |      12 |           44 |         0.24 |           4.56392 |
+|     6 | (2.054, 2.727]   |   2.3905 |       5 |           49 |          0.1 |            1.1455 |
+|     7 | (2.727, 3.4]     |   3.0635 |       1 |           50 |         0.02 |          0.182787 |
+:END:
+
+
+* Příklad 2
+*Měřením dvojice (Výška[cm]. Váha[kg]) u vybraných studentů z FIT byl získán dvourozměrný
+statistický soubor zapsaný po dvojicích v řádcích v listu Data př. 2.*
+
+* Source                                                        :noexport:
+#+TBLNAME: ex1
+|  1.83 |
+|  0.98 |
+| -0.09 |
+| -0.23 |
+|  2.56 |
+|  0.31 |
+|  1.06 |
+|  0.01 |
+|  0.75 |
+|  2.26 |
+| -0.59 |
+|  0.90 |
+|  1.66 |
+|  0.36 |
+|  2.19 |
+|  1.24 |
+| -0.58 |
+|  0.79 |
+|  0.02 |
+|  0.31 |
+|  1.61 |
+|  0.75 |
+|  2.46 |
+|  0.86 |
+|  0.63 |
+| -0.98 |
+| -0.75 |
+|  2.67 |
+|  1.79 |
+|  1.84 |
+|  0.49 |
+|  1.68 |
+|  0.39 |
+| -0.84 |
+|  1.49 |
+|  1.50 |
+|  1.70 |
+|  3.40 |
+|  1.40 |
+|  0.27 |
+|  0.48 |
+|  0.27 |
+|  1.41 |
+|  0.55 |
+|  1.20 |
+| -0.68 |
+|  1.59 |
+|  0.80 |
+|  1.21 |
+| -1.31 |
+
+#+TBLNAME: ex2
+| 150 | 50 |
+| 177 | 73 |
+| 154 | 53 |
+| 152 | 44 |
+| 169 | 69 |
+| 200 | 94 |
+| 196 | 99 |
+| 181 | 74 |
+| 152 | 50 |
+| 172 | 74 |
+| 152 | 58 |
+| 150 | 46 |
+| 178 | 78 |
+| 154 | 57 |
+| 190 | 90 |
+| 195 | 98 |
+| 182 | 80 |
+| 184 | 88 |
+| 156 | 42 |
+| 154 | 66 |

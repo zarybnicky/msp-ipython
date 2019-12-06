@@ -1,0 +1,9 @@
+.direnv/
+_minted-*/
+auto/
+ltximg/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out

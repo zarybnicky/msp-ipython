@@ -1,0 +1,225 @@
+% Created 2019-12-06 Fri 00:50
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt,titlepage]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage[a4paper,total={6.5in, 9in}]{geometry}
+\usepackage{libertine}
+\usepackage{minted}
+\usepackage{float}
+\usepackage[caption = false]{subfig}
+\setminted{fontsize=\footnotesize}
+\author{Jakub Zárybnický, xzaryb00}
+\date{6. 12. 2019}
+\title{Projekt z MSP\\\medskip
+\large Logo VUT! VYSOKÉ UČENÍ TECHNICKÉ V BRNĚ Fakulta informačních technologií Čísla zadání: 21, 6 Cvičení - skupina: pátek, 9.00}
+\hypersetup{
+ pdfauthor={Jakub Zárybnický, xzaryb00},
+ pdftitle={Projekt z MSP},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 26.1 (Org mode 9.1.9)}, 
+ pdflang={Czech}}
+\begin{document}
+
+\maketitle
+(setq python-shell-interpreter "/nix/store/gpnm7i19lpj8p43mjrdw03d0hjalmskl-python3-3.7.5/bin/python")
+
+\section{Zadání projektu z předmětu MSP}
+\label{sec:org6c1c812}
+\textbf{Každý student obdrží na cvičení konkrétní data (čísla ze seznamu), pro které vypracuje projekt.}
+K vypracování můžete použít libovolné statistické programy.
+
+\begin{enumerate}
+\item Při kontrole výrobků byla sledována odchylka X [mm] jejich rozměru od
+požadované velikosti. Naměřené hodnoty tvoří statistický soubor v listu
+Data př. 1.
+
+\begin{enumerate}
+\item Proveďte roztřídění statistického souboru, vytvořte tabulku četností a
+nakreslete histogramy pro relativní četnosti a relativní kumulativní
+četnosti.
+\item Vypočtěte aritmetický průměr, medián, modus, rozptyl a směrodatnou
+odchylku.
+\item Vypočtěte bodové odhady střední hodnoty, rozptylu a směrodatné odchylky.
+\item Testujte předpoklad o výběru z normálního rozdělení Pearsonovým
+(chí-kvadrát) testem na hladině významnosti 0,05.
+\item Za předpokladu (bez ohledu na výsledek části d)), že statistický soubor
+byl získán náhodným výběrem z normálního rozdělení, určete intervalové
+odhady střední hodnoty, rozptylu a směrodatné odchylky se spolehlivostí
+0,95 a 0,99.
+\item Testujte hypotézu optimálního seřízení stroje, tj. že střední hodnota
+odchylky je nulová, proti dvoustranné alternativní hypotéze, že střední
+hodnota odchylky je různá od nuly, a to na hladině významnosti 0,05.
+\item Ověřte statistickým testem na hladině významnosti 0,05, zda seřízení
+stroje ovlivnilo kvalitu výroby, víte-li, že výše uvedený statistický
+soubor 50-ti hodnot vznikl spojením dvou dílčích statistických souborů
+tak, že po naměření prvních 20-ti hodnot bylo provedeno nové seřízení
+stroje a pak bylo naměřeno zbývajících 30 hodnot.
+\end{enumerate}
+
+Návod: Oba soubory zpracujte neroztříděné. Testujte nejprve rovnost rozptylů
+odchylek před a po seřízení stroje. Podle výsledku pak zvolte vhodný postup
+pro testování rovnosti středních hodnot odchylek před a po seřízení stroje.
+
+\item Měřením dvojice (Výška[cm], Váha[kg]) u vybraných studentů z FIT byl získán
+dvourozměrný statistický soubor zapsaný po dvojicích v řádcích v listu
+Data př. 2.
+
+\begin{figure}
+\subfloat[caption]{\begin{tabular}{ccc}
+\hline
+a&b&c\\
+\hline
+\end{tabular}}\\
+\subfloat[caption]{\begin{tabular}{ccc}
+\hline
+d&e&f\\
+\hline
+\end{tabular}}
+\end{figure}
+
+\begin{enumerate}
+\item Vypočtěte bodový odhad koeficientu korelace.
+\item Na hladině významnosti 0,05 testujte hypotézu, že náhodné veličiny Výška a
+Váha jsou lineárně nezávislé.
+\item \textbf{Regresní analýza} - data proložte přímkou: \(Vaha = \beta_0 + \beta_1 \times Vyska\)
+\begin{enumerate}
+\item Bodově odhadněte \(\beta_0\), \(\beta_1\) a rozptyl \(s_2\).
+\item Na hladině významnosti 0,05 otestujte hypotézy:
+\[H : \beta_0 = -100, H_A : \beta_0 \neq -100,\]
+\[H : \beta_1 = 1, H_A : \beta_1 \neq 1,\]
+\item Vytvořte graf bodů spolu s regresní přímkou a pásem spolehlivosti pro
+individuální hodnotu výšky.
+\end{enumerate}
+\end{enumerate}
+\end{enumerate}
+
+\textbf{Termín pro odevzdání práce je 11 týden výuky zimního semestru ve cvičení.}
+
+\begin{center}
+\label{tab:orgc05cd70}
+\begin{tabular}{lrr}
+a & 1 & 2\\
+b & 2 & 3\\
+c & 3 & 4\\
+\end{tabular}
+\end{center}
+
+
+\begin{minted}[]{python}
+(x, data)
+\end{minted}
+
+\begin{verbatim}
+# Out[17]:
+: (2, [['a', 1, 2], ['b', 2, 3], ['c', 3, 4]])
+\end{verbatim}
+
+\begin{minted}[]{python}
+_ = plt.hist(np.random.randn(20000), bins=200)
+\end{minted}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{./obipy-resources/9LEZBV.png}
+\end{center}
+
+\section{Příklad 1}
+\label{sec:org6e26c23}
+\textbf{Při kontrole výrobků byla sledována odchylka X [mm] jejich rozměru od požadované velikosti.
+Naměřené hodnoty tvoří statistický soubor v listu Data př. 1.}
+
+X [mm]
+1,83
+0,98
+-0,09
+-0,23
+2,56
+0,31
+1,06
+0,01
+0,75
+2,26
+-0,59
+0,90
+1,66
+0,36
+2,19
+1,24
+-0,58
+0,79
+0,02
+0,31
+1,61
+0,75
+2,46
+0,86
+0,63
+-0,98
+-0,75
+2,67
+1,79
+1,84
+0,49
+1,68
+0,39
+-0,84
+1,49
+1,50
+1,70
+3,40
+1,40
+0,27
+0,48
+0,27
+1,41
+0,55
+1,20
+-0,68
+1,59
+0,80
+1,21
+-1,31
+
+\section{Příklad 2}
+\label{sec:orgf13985c}
+\textbf{Měřením dvojice (Výška[cm], Váha[kg]) u vybraných studentů z FIT byl získán dvourozměrný
+statistický soubor zapsaný po dvojicích v řádcích v listu Data př. 2.}
+
+Výška [cm]	Váha [kg]
+150	50
+177	73
+154	53
+152	44
+169	69
+200	94
+196	99
+181	74
+152	50
+172	74
+152	58
+150	46
+178	78
+154	57
+190	90
+195	98
+182	80
+184	88
+156	42
+154	66
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
